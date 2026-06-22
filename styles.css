@@ -631,8 +631,7 @@ h2 {
   text-align: center;
 }
 
-.storage-note,
-.ad-space {
+.storage-note {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -653,20 +652,7 @@ h2 {
 
 .ad-space {
   min-height: 84px;
-  border: 2px dashed var(--line-strong);
-  background: rgba(255, 255, 255, 0.58);
-}
-
-.ad-space strong {
-  display: block;
-  color: var(--muted);
-  font-size: 1rem;
-}
-
-.ad-space p {
-  margin: 2px 0 0;
-  font-size: 0.78rem;
-  font-weight: 700;
+  margin-top: 14px;
 }
 
 button:hover {

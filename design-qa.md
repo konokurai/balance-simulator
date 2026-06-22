@@ -1,5 +1,5 @@
 **Source Visual Truth**
-- Path: `/Users/yotamiyabara/balance-simulator/reference-option-2.png`
+- Source: temporary ImageGen option 2 reference, inspected during implementation. The copied local reference image was removed because it is not required at runtime.
 
 **Implementation Screenshot**
 - Path: not captured
@@ -24,14 +24,14 @@
   Location: full implementation screen.
   Evidence: source image is available, but no implementation screenshot was captured.
   Impact: design-qa cannot honestly pass without seeing the rendered page against the selected mock.
-  Fix: run `python3 -m http.server 4173`, open `http://localhost:4173/`, capture the mobile viewport, and compare it to `reference-option-2.png`.
+  Fix: run `python3 -m http.server 4173`, open `http://localhost:4173/`, capture the mobile viewport, and compare it against the selected option 2 reference if visual QA is resumed.
 
 **Open Questions**
 - None about the intended product behavior. The blocker is only visual capture access.
 
 **Implementation Checklist**
 - Capture the rendered implementation at `390 x 844`.
-- Compare first-screen hierarchy, form density, chart placement, schedule list spacing, typography, semantic colors, icon weight, and ad-space placement.
+- Compare first-screen hierarchy, form density, chart placement, schedule list spacing, typography, semantic colors, icon weight, and reserved bottom spacing.
 - Fix any P0/P1/P2 visual mismatches found in that pass.
 
 **Follow-up Polish**
@@ -39,7 +39,7 @@
 
 **Patches Made Since Previous QA Pass**
 - Initial implementation created in `index.html`, `styles.css`, and `app.js`.
-- Source reference copied to `reference-option-2.png`.
+- Runtime-unneeded source reference copy removed.
 
 **Final Result**
 - final result: blocked
