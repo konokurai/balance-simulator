@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="MiraiZandaka はブラウザだけで動く未来残高シミュレーターです。">
+    <title>MiraiZandaka | 未来残高シミュレーター</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
+    <script>
+      window.tailwind = {
+        config: {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['"Noto Sans JP"', 'system-ui', 'sans-serif']
+              }
+            }
+          }
+        }
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-icon material-symbols-rounded" aria-hidden="true">calculate</span>
+          <div>
+            <p class="brand-name">MiraiZandaka</p>
+            <p class="brand-subtitle">未来残高シミュレーター</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="save-indicator">
+            <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+            localStorage保存
+          </span>
+          <button class="icon-button" id="menuButton" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="メニュー">
+            <span class="material-symbols-rounded" aria-hidden="true">menu</span>
+          </button>
+          <div class="menu-panel" id="menuPanel" hidden>
+            <button type="button" id="loadSampleButton">
+              <span class="material-symbols-rounded" aria-hidden="true">restart_alt</span>
+              サンプルに戻す
+            </button>
+            <button type="button" id="clearDataButton">
+              <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+              保存データを削除
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="summary-strip" aria-label="残高サマリー">
+          <article class="summary-cell current">
+            <span>現在残高</span>
+            <strong id="currentBalanceText">¥0</strong>
+            <small id="updatedAtText">未保存</small>
+          </article>
+          <article class="summary-cell">
+            <span>3ヶ月後の予測</span>
+            <strong id="threeMonthText">¥0</strong>
+            <small id="threeMonthDelta">差分 ¥0</small>
+          </article>
+          <article class="summary-cell">
+            <span>6ヶ月後の予測</span>
+            <strong id="sixMonthText">¥0</strong>
+            <small id="sixMonthDelta">差分 ¥0</small>
+          </article>
+        </section>
+
+        <div class="workspace">
+          <section class="panel entry-panel" aria-labelledby="entryTitle">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">quick input</span>
+                <h1 id="entryTitle">予定を追加</h1>
+              </div>
+              <button class="text-button" id="cancelEditButton" type="button" hidden>編集をやめる</button>
+            </div>
+
+            <form id="scheduleForm" class="entry-form" novalidate>
+              <label class="field">
+                <span>タイトル</span>
+                <input id="titleInput" type="text" maxlength="28" autocomplete="off" placeholder="例: 食費、給与、家賃など" required>
+              </label>
+
+              <label class="field">
+                <span>金額</span>
+                <div class="amount-row">
+                  <span class="yen-prefix" aria-hidden="true">¥</span>
+                  <input id="amountInput" type="number" inputmode="numeric" min="0" step="100" placeholder="0" required>
+                </div>
+              </label>
+
+              <div class="quick-amounts" aria-label="金額をすばやく追加">
+                <button type="button" data-amount="1000">+1,000</button>
+                <button type="button" data-amount="5000">+5,000</button>
+                <button type="button" data-amount="10000">+10,000</button>
+                <button type="button" data-amount="50000">+50,000</button>
+              </div>
+
+              <fieldset class="field-group">
+                <legend>種類</legend>
+                <div class="segmented-control" role="group" aria-label="収入または支出">
+                  <button type="button" class="segment is-active income" id="incomeButton" data-kind="income" aria-pressed="true">
+                    <span class="material-symbols-rounded" aria-hidden="true">north_east</span>
+                    収入
+                  </button>
+                  <button type="button" class="segment expense" id="expenseButton" data-kind="expense" aria-pressed="false">
+                    <span class="material-symbols-rounded" aria-hidden="true">south_east</span>
+                    支出
+                  </button>
+                </div>
+              </fieldset>
+
+              <fieldset class="field-group">
+                <legend>繰り返し</legend>
+                <div class="segmented-control" role="group" aria-label="予定タイプ">
+                  <button type="button" class="segment is-active" data-repeat="monthly" aria-pressed="true">
+                    <span class="material-symbols-rounded" aria-hidden="true">sync</span>
+                    毎月
+                  </button>
+                  <button type="button" class="segment" data-repeat="one-time" aria-pressed="false">
+                    <span class="material-symbols-rounded" aria-hidden="true">event</span>
+                    単発
+                  </button>
+                </div>
+              </fieldset>
+
+              <div class="date-grid">
+                <label class="field" id="monthlyDayField">
+                  <span>毎月の日付</span>
+                  <input id="dayInput" type="number" min="1" max="31" inputmode="numeric" value="25">
+                </label>
+                <label class="field" id="oneTimeDateField" hidden>
+                  <span>単発の日付</span>
+                  <input id="dateInput" type="date">
+                </label>
+                <label class="field">
+                  <span>現在残高</span>
+                  <input id="balanceInput" type="number" inputmode="numeric" step="1000" required>
+                </label>
+              </div>
+
+              <p class="form-feedback" id="formFeedback" role="status" aria-live="polite"></p>
+
+              <div class="form-actions">
+                <button class="save-balance-button" id="saveBalanceButton" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                  残高を保存
+                </button>
+                <button class="primary-button" id="submitButton" type="submit">
+                  <span class="material-symbols-rounded" aria-hidden="true">add_circle</span>
+                  追加する
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel chart-panel" aria-labelledby="chartTitle">
+            <div class="panel-heading inline-heading">
+              <div>
+                <span class="eyebrow">forecast</span>
+                <h2 id="chartTitle">予測残高の推移</h2>
+              </div>
+              <div class="range-tabs" role="group" aria-label="表示期間">
+                <button type="button" data-range="30">30日</button>
+                <button type="button" class="is-active" data-range="90">90日</button>
+                <button type="button" data-range="180">180日</button>
+              </div>
+            </div>
+            <div class="forecast-note" id="forecastNote"></div>
+            <div class="chart-frame">
+              <canvas id="balanceChart" aria-label="未来の残高推移グラフ"></canvas>
+              <p class="chart-fallback" id="chartFallback" hidden>Chart.jsを読み込むとグラフが表示されます。</p>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel schedule-panel" aria-labelledby="scheduleTitle">
+          <div class="panel-heading inline-heading">
+            <div>
+              <span class="eyebrow">upcoming</span>
+              <h2 id="scheduleTitle">今後の予定</h2>
+            </div>
+            <p class="schedule-total" id="monthlyTotalText">毎月合計 ¥0</p>
+          </div>
+          <div id="scheduleList" class="schedule-list"></div>
+          <p class="empty-state" id="emptyState" hidden>予定はまだありません。最初の固定費や給与を追加してみましょう。</p>
+        </section>
+
+        <section class="storage-note" aria-label="保存方法">
+          <span class="material-symbols-rounded" aria-hidden="true">shield_lock</span>
+          データはこの端末のブラウザにのみ保存されます。
+        </section>
+
+        <aside class="ad-space" aria-label="広告スペース">
+          <span class="material-symbols-rounded" aria-hidden="true">campaign</span>
+          <div>
+            <strong>広告スペース</strong>
+            <p>将来のWeb広告表示用エリア</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
