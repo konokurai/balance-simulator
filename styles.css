@@ -125,6 +125,27 @@ button {
   white-space: nowrap;
 }
 
+.locale-switcher {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0 8px;
+  color: var(--muted);
+}
+
+.locale-switcher select {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 800;
+  outline: none;
+}
+
 .icon-button {
   display: grid;
   width: 44px;
@@ -675,6 +696,15 @@ input:focus-visible {
   }
 
   .save-indicator {
+    display: none;
+  }
+
+  .locale-switcher {
+    min-height: 38px;
+    padding: 0 6px;
+  }
+
+  .locale-switcher .material-symbols-rounded {
     display: none;
   }
 

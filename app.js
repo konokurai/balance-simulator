@@ -1,6 +1,221 @@
 const STORAGE_KEY = "miraizandaka_state_v1";
+const LOCALE_KEY = "miraizandaka_locale_v1";
+const SUPPORTED_LOCALES = ["ja", "en"];
+
+const I18N = {
+  ja: {
+    app: {
+      title: "MiraiZandaka | 未来残高シミュレーター",
+      description: "MiraiZandaka はブラウザだけで動く未来残高シミュレーターです。",
+      subtitle: "未来残高シミュレーター"
+    },
+    language: {
+      label: "言語"
+    },
+    menu: {
+      label: "メニュー",
+      sample: "サンプルに戻す",
+      clear: "保存データを削除"
+    },
+    storage: {
+      local: "localStorage保存",
+      aria: "保存方法",
+      note: "データはこの端末のブラウザにのみ保存されます。"
+    },
+    summary: {
+      aria: "残高サマリー",
+      current: "現在残高",
+      unsaved: "未保存",
+      threeMonths: "3ヶ月後の予測",
+      sixMonths: "6ヶ月後の予測",
+      updatedAt: "更新 {date}",
+      delta: "差分 {amount}"
+    },
+    entry: {
+      title: "予定を追加"
+    },
+    fields: {
+      title: "タイトル",
+      titlePlaceholder: "例: 食費、給与、家賃など",
+      amount: "金額",
+      quickAmounts: "金額をすばやく追加",
+      kind: "種類",
+      kindAria: "収入または支出",
+      repeat: "繰り返し",
+      repeatAria: "予定タイプ",
+      monthlyDay: "毎月の日付",
+      oneTimeDate: "単発の日付",
+      currentBalance: "現在残高"
+    },
+    kind: {
+      income: "収入",
+      expense: "支出"
+    },
+    repeat: {
+      monthly: "毎月",
+      oneTime: "単発"
+    },
+    actions: {
+      add: "追加する",
+      update: "更新する",
+      saveBalance: "残高を保存",
+      cancelEdit: "編集をやめる",
+      editItem: "{title}を編集",
+      deleteItem: "{title}を削除"
+    },
+    forecast: {
+      title: "予測残高の推移",
+      rangeAria: "表示期間",
+      range30: "30日",
+      range90: "90日",
+      range180: "180日",
+      chartAria: "未来の残高推移グラフ",
+      chartFallback: "Chart.jsを読み込むとグラフが表示されます。",
+      period: "表示期間",
+      final: "最終予測",
+      lowest: "最低残高",
+      projectedBalance: "予測残高",
+      currentBalance: "現在残高"
+    },
+    schedule: {
+      title: "今後の予定",
+      empty: "予定はまだありません。最初の固定費や給与を追加してみましょう。",
+      monthlyTotal: "毎月合計 {amount}"
+    },
+    feedback: {
+      storageFailed: "ブラウザの保存領域に書き込めませんでした。",
+      titleRequired: "タイトルを入力してください。",
+      amountRequired: "金額は1円以上で入力してください。",
+      balanceRequired: "現在残高を入力してください。",
+      updated: "予定を更新しました。",
+      added: "予定を追加しました。",
+      balanceSaved: "現在残高を保存しました。",
+      editing: "予定を編集しています。",
+      deleted: "予定を削除しました。"
+    },
+    confirm: {
+      deleteSchedule: "「{title}」を削除しますか？",
+      loadSample: "サンプルデータに戻しますか？現在の入力内容は上書きされます。",
+      clearData: "保存データを削除しますか？画面は初期サンプルに戻ります。"
+    },
+    sample: {
+      salary: "給与振り込み",
+      rent: "家賃引き落とし",
+      food: "食費",
+      utility: "電気代",
+      bonus: "ボーナス",
+      car: "車検"
+    }
+  },
+  en: {
+    app: {
+      title: "MiraiZandaka | Future Balance Simulator",
+      description: "MiraiZandaka is a browser-only future balance simulator.",
+      subtitle: "Future Balance Simulator"
+    },
+    language: {
+      label: "Language"
+    },
+    menu: {
+      label: "Menu",
+      sample: "Reset to sample",
+      clear: "Delete saved data"
+    },
+    storage: {
+      local: "Saved locally",
+      aria: "Storage method",
+      note: "Your data is saved only in this browser on this device."
+    },
+    summary: {
+      aria: "Balance summary",
+      current: "Current balance",
+      unsaved: "Not saved",
+      threeMonths: "Projected in 3 months",
+      sixMonths: "Projected in 6 months",
+      updatedAt: "Updated {date}",
+      delta: "Change {amount}"
+    },
+    entry: {
+      title: "Add schedule"
+    },
+    fields: {
+      title: "Title",
+      titlePlaceholder: "e.g. groceries, salary, rent",
+      amount: "Amount",
+      quickAmounts: "Quick amount add buttons",
+      kind: "Kind",
+      kindAria: "Income or expense",
+      repeat: "Repeat",
+      repeatAria: "Schedule type",
+      monthlyDay: "Monthly day",
+      oneTimeDate: "One-time date",
+      currentBalance: "Current balance"
+    },
+    kind: {
+      income: "Income",
+      expense: "Expense"
+    },
+    repeat: {
+      monthly: "Monthly",
+      oneTime: "One-time"
+    },
+    actions: {
+      add: "Add",
+      update: "Update",
+      saveBalance: "Save balance",
+      cancelEdit: "Cancel edit",
+      editItem: "Edit {title}",
+      deleteItem: "Delete {title}"
+    },
+    forecast: {
+      title: "Projected balance",
+      rangeAria: "Forecast range",
+      range30: "30 days",
+      range90: "90 days",
+      range180: "180 days",
+      chartAria: "Future balance chart",
+      chartFallback: "Load Chart.js to show the chart.",
+      period: "Range",
+      final: "Final projection",
+      lowest: "Lowest balance",
+      projectedBalance: "Projected balance",
+      currentBalance: "Current balance"
+    },
+    schedule: {
+      title: "Upcoming schedules",
+      empty: "No schedules yet. Add your first fixed cost or income.",
+      monthlyTotal: "Monthly total {amount}"
+    },
+    feedback: {
+      storageFailed: "Could not write to this browser's storage.",
+      titleRequired: "Enter a title.",
+      amountRequired: "Enter an amount greater than zero.",
+      balanceRequired: "Enter your current balance.",
+      updated: "Schedule updated.",
+      added: "Schedule added.",
+      balanceSaved: "Current balance saved.",
+      editing: "Editing a schedule.",
+      deleted: "Schedule deleted."
+    },
+    confirm: {
+      deleteSchedule: "Delete \"{title}\"?",
+      loadSample: "Reset to sample data? Your current entries will be overwritten.",
+      clearData: "Delete saved data? The screen will return to the sample data."
+    },
+    sample: {
+      salary: "Salary deposit",
+      rent: "Rent payment",
+      food: "Groceries",
+      utility: "Electric bill",
+      bonus: "Bonus",
+      car: "Vehicle inspection"
+    }
+  }
+};
 
 const elements = {
+  metaDescription: document.querySelector('meta[name="description"]'),
+  localeSelect: document.querySelector("#localeSelect"),
   menuButton: document.querySelector("#menuButton"),
   menuPanel: document.querySelector("#menuPanel"),
   loadSampleButton: document.querySelector("#loadSampleButton"),
@@ -34,6 +249,7 @@ const elements = {
   monthlyTotalText: document.querySelector("#monthlyTotalText")
 };
 
+let currentLocale = loadLocale();
 let state = loadState();
 let selectedKind = "expense";
 let selectedRepeat = "monthly";
@@ -44,16 +260,19 @@ let balanceChart = null;
 initialize();
 
 function initialize() {
+  elements.localeSelect.value = currentLocale;
   elements.dateInput.value = formatDateKey(addDays(today(), 7));
   elements.balanceInput.value = state.user_profile.current_balance;
   setKind("expense");
   setRepeat("monthly");
   bindEvents();
+  applyI18n();
   render();
 }
 
 function bindEvents() {
   elements.menuButton.addEventListener("click", toggleMenu);
+  elements.localeSelect.addEventListener("change", () => setLocale(elements.localeSelect.value));
   document.addEventListener("click", closeMenuOnOutsideClick);
   elements.loadSampleButton.addEventListener("click", loadSampleData);
   elements.clearDataButton.addEventListener("click", clearSavedData);
@@ -95,6 +314,81 @@ function bindEvents() {
   });
 }
 
+function normalizeLocale(locale) {
+  const normalized = String(locale || "").toLowerCase().split("-")[0];
+  return SUPPORTED_LOCALES.includes(normalized) ? normalized : "ja";
+}
+
+function loadLocale() {
+  try {
+    const saved = localStorage.getItem(LOCALE_KEY);
+    if (saved) {
+      return normalizeLocale(saved);
+    }
+  } catch {
+    // Keep using browser language when localStorage is unavailable.
+  }
+
+  return normalizeLocale(navigator.language || "ja");
+}
+
+function persistLocale(locale) {
+  try {
+    localStorage.setItem(LOCALE_KEY, locale);
+  } catch {
+    // Locale choice is non-critical; the app can still run without persisting it.
+  }
+}
+
+function setLocale(locale) {
+  currentLocale = normalizeLocale(locale);
+  elements.localeSelect.value = currentLocale;
+  persistLocale(currentLocale);
+  applyI18n();
+  render();
+}
+
+function t(key, values = {}) {
+  const fallback = getNested(I18N.ja, key) || key;
+  const template = getNested(I18N[currentLocale], key) || fallback;
+  return interpolate(template, values);
+}
+
+function getNested(source, path) {
+  return path.split(".").reduce((value, part) => {
+    if (value && Object.prototype.hasOwnProperty.call(value, part)) {
+      return value[part];
+    }
+    return undefined;
+  }, source);
+}
+
+function interpolate(template, values) {
+  return String(template).replace(/\{(\w+)\}/g, (_, key) => {
+    return values[key] ?? "";
+  });
+}
+
+function applyI18n() {
+  document.documentElement.lang = currentLocale;
+  document.title = t("app.title");
+  elements.metaDescription?.setAttribute("content", t("app.description"));
+
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = t(node.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.setAttribute("placeholder", t(node.dataset.i18nPlaceholder));
+  });
+
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((node) => {
+    node.setAttribute("aria-label", t(node.dataset.i18nAriaLabel));
+  });
+
+  setSubmitButtonLabel();
+}
+
 function defaultState() {
   return {
     user_profile: {
@@ -104,42 +398,42 @@ function defaultState() {
     schedules: [
       {
         id: "item_salary",
-        title: "給与振り込み",
+        title: t("sample.salary"),
         amount: 295000,
         type: "monthly",
         day: 25
       },
       {
         id: "item_rent",
-        title: "家賃引き落とし",
+        title: t("sample.rent"),
         amount: -85000,
         type: "monthly",
         day: 27
       },
       {
         id: "item_food",
-        title: "食費",
+        title: t("sample.food"),
         amount: -30000,
         type: "monthly",
         day: 27
       },
       {
         id: "item_utility",
-        title: "電気代",
+        title: t("sample.utility"),
         amount: -8500,
         type: "monthly",
         day: 3
       },
       {
         id: "item_bonus",
-        title: "ボーナス",
+        title: t("sample.bonus"),
         amount: 120000,
         type: "one-time",
         date: "2026-07-10"
       },
       {
         id: "item_car",
-        title: "車検",
+        title: t("sample.car"),
         amount: -100000,
         type: "one-time",
         date: "2026-09-15"
@@ -186,7 +480,7 @@ function persist() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     return true;
   } catch {
-    setFeedback("ブラウザの保存領域に書き込めませんでした。", true);
+    setFeedback(t("feedback.storageFailed"), true);
     return false;
   }
 }
@@ -203,7 +497,7 @@ function renderSummary() {
   const sixMonth = projectBalance(180).at(-1).balance;
 
   elements.currentBalanceText.textContent = formatCurrency(current);
-  elements.updatedAtText.textContent = `更新 ${formatDateTime(state.user_profile.updated_at)}`;
+  elements.updatedAtText.textContent = t("summary.updatedAt", { date: formatDateTime(state.user_profile.updated_at) });
   elements.threeMonthText.textContent = formatCurrency(threeMonth);
   elements.sixMonthText.textContent = formatCurrency(sixMonth);
   elements.threeMonthDelta.textContent = formatDelta(threeMonth - current);
@@ -223,9 +517,9 @@ function renderChart() {
   const finalRow = projection.at(-1);
 
   elements.forecastNote.innerHTML = `
-    <span>表示期間 <strong>${chartRange}日</strong></span>
-    <span>最終予測 <strong>${formatCurrency(finalRow.balance)}</strong></span>
-    <span>最低残高 <strong>${formatCurrency(minRow.balance)} / ${formatShortDate(parseDateKey(minRow.date))}</strong></span>
+    <span>${t("forecast.period")} <strong>${formatRangeDays(chartRange)}</strong></span>
+    <span>${t("forecast.final")} <strong>${formatCurrency(finalRow.balance)}</strong></span>
+    <span>${t("forecast.lowest")} <strong>${formatCurrency(minRow.balance)} / ${formatShortDate(parseDateKey(minRow.date))}</strong></span>
   `;
 
   if (!window.Chart) {
@@ -247,7 +541,7 @@ function renderChart() {
       labels: displayRows.map((row) => formatShortDate(parseDateKey(row.date))),
       datasets: [
         {
-          label: "予測残高",
+          label: t("forecast.projectedBalance"),
           data: displayRows.map((row) => row.balance),
           borderColor: "#149246",
           backgroundColor: "rgba(20, 146, 70, 0.1)",
@@ -257,7 +551,7 @@ function renderChart() {
           pointHoverRadius: 5
         },
         {
-          label: "現在残高",
+          label: t("forecast.currentBalance"),
           data: displayRows.map(() => state.user_profile.current_balance),
           borderColor: "#aab6b0",
           borderDash: [6, 6],
@@ -327,7 +621,7 @@ function renderScheduleList() {
   const monthlyTotal = state.schedules
     .filter((item) => item.type === "monthly")
     .reduce((total, item) => total + item.amount, 0);
-  elements.monthlyTotalText.textContent = `毎月合計 ${formatSignedCurrency(monthlyTotal)}`;
+  elements.monthlyTotalText.textContent = t("schedule.monthlyTotal", { amount: formatSignedCurrency(monthlyTotal) });
 
   const occurrences = getUpcomingOccurrences(10, 220);
   elements.emptyState.hidden = occurrences.length > 0;
@@ -349,15 +643,15 @@ function renderScheduleList() {
           <div class="schedule-main">
             <div class="schedule-title">
               <span>${escapeHtml(item.title)}</span>
-              <span class="badge">${item.type === "monthly" ? "毎月" : "単発"}</span>
+              <span class="badge">${item.type === "monthly" ? t("repeat.monthly") : t("repeat.oneTime")}</span>
             </div>
             <div class="schedule-amount ${isIncome ? "income" : "expense"}">${formatSignedCurrency(item.amount)}</div>
           </div>
           <div class="row-actions">
-            <button type="button" data-edit-id="${safeId}" aria-label="${escapeHtml(item.title)}を編集">
+            <button type="button" data-edit-id="${safeId}" aria-label="${escapeHtml(t("actions.editItem", { title: item.title }))}">
               <span class="material-symbols-rounded" aria-hidden="true">edit</span>
             </button>
-            <button type="button" data-delete-id="${safeId}" aria-label="${escapeHtml(item.title)}を削除">
+            <button type="button" data-delete-id="${safeId}" aria-label="${escapeHtml(t("actions.deleteItem", { title: item.title }))}">
               <span class="material-symbols-rounded" aria-hidden="true">delete</span>
             </button>
           </div>
@@ -375,19 +669,19 @@ function saveScheduleFromForm(event) {
   const balance = Number(elements.balanceInput.value);
 
   if (!title) {
-    setFeedback("タイトルを入力してください。", true);
+    setFeedback(t("feedback.titleRequired"), true);
     elements.titleInput.focus();
     return;
   }
 
   if (!Number.isFinite(rawAmount) || rawAmount <= 0) {
-    setFeedback("金額は1円以上で入力してください。", true);
+    setFeedback(t("feedback.amountRequired"), true);
     elements.amountInput.focus();
     return;
   }
 
   if (!Number.isFinite(balance)) {
-    setFeedback("現在残高を入力してください。", true);
+    setFeedback(t("feedback.balanceRequired"), true);
     elements.balanceInput.focus();
     return;
   }
@@ -411,10 +705,10 @@ function saveScheduleFromForm(event) {
 
   if (editingId) {
     state.schedules = state.schedules.map((item) => (item.id === editingId ? schedule : item));
-    setFeedback("予定を更新しました。", false);
+    setFeedback(t("feedback.updated"), false);
   } else {
     state.schedules.push(schedule);
-    setFeedback("予定を追加しました。", false);
+    setFeedback(t("feedback.added"), false);
   }
 
   persist();
@@ -425,7 +719,7 @@ function saveScheduleFromForm(event) {
 function saveCurrentBalance() {
   const balance = Number(elements.balanceInput.value);
   if (!Number.isFinite(balance)) {
-    setFeedback("現在残高を入力してください。", true);
+    setFeedback(t("feedback.balanceRequired"), true);
     elements.balanceInput.focus();
     return;
   }
@@ -434,7 +728,7 @@ function saveCurrentBalance() {
   state.user_profile.updated_at = new Date().toISOString();
   persist();
   render();
-  setFeedback("現在残高を保存しました。", false);
+  setFeedback(t("feedback.balanceSaved"), false);
 }
 
 function startEdit(id) {
@@ -456,9 +750,9 @@ function startEdit(id) {
     elements.dateInput.value = item.date || formatDateKey(today());
   }
 
-  elements.submitButton.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">check_circle</span>更新する';
+  setSubmitButtonLabel();
   elements.cancelEditButton.hidden = false;
-  setFeedback("予定を編集しています。", false);
+  setFeedback(t("feedback.editing"), false);
   elements.titleInput.focus();
   elements.form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -469,7 +763,7 @@ function deleteSchedule(id) {
     return;
   }
 
-  if (!window.confirm(`「${item.title}」を削除しますか？`)) {
+  if (!window.confirm(t("confirm.deleteSchedule", { title: item.title }))) {
     return;
   }
 
@@ -477,7 +771,7 @@ function deleteSchedule(id) {
   persist();
   render();
   resetForm({ keepFeedback: true });
-  setFeedback("予定を削除しました。", false);
+  setFeedback(t("feedback.deleted"), false);
 }
 
 function resetForm(options = {}) {
@@ -488,7 +782,7 @@ function resetForm(options = {}) {
   elements.dateInput.value = formatDateKey(addDays(today(), 7));
   setKind("expense");
   setRepeat("monthly");
-  elements.submitButton.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">add_circle</span>追加する';
+  setSubmitButtonLabel();
   elements.cancelEditButton.hidden = true;
 
   if (!options.keepFeedback) {
@@ -528,6 +822,12 @@ function setFeedback(message, isError) {
   elements.formFeedback.classList.toggle("is-error", Boolean(isError));
 }
 
+function setSubmitButtonLabel() {
+  const icon = editingId ? "check_circle" : "add_circle";
+  const label = editingId ? t("actions.update") : t("actions.add");
+  elements.submitButton.innerHTML = `<span class="material-symbols-rounded" aria-hidden="true">${icon}</span><span data-i18n-submit-label>${label}</span>`;
+}
+
 function toggleMenu() {
   const shouldOpen = elements.menuPanel.hidden;
   elements.menuPanel.hidden = !shouldOpen;
@@ -548,7 +848,7 @@ function closeMenuOnOutsideClick(event) {
 }
 
 function loadSampleData() {
-  if (!window.confirm("サンプルデータに戻しますか？現在の入力内容は上書きされます。")) {
+  if (!window.confirm(t("confirm.loadSample"))) {
     return;
   }
 
@@ -561,7 +861,7 @@ function loadSampleData() {
 }
 
 function clearSavedData() {
-  if (!window.confirm("保存データを削除しますか？画面は初期サンプルに戻ります。")) {
+  if (!window.confirm(t("confirm.clearData"))) {
     return;
   }
 
@@ -642,15 +942,15 @@ function thinChartRows(rows, days) {
 }
 
 function chooseIcon(item) {
-  const title = item.title;
+  const title = item.title.toLowerCase();
   if (item.amount > 0) {
-    return title.includes("給与") ? "account_balance_wallet" : "redeem";
+    return title.includes("給与") || title.includes("salary") ? "account_balance_wallet" : "redeem";
   }
-  if (title.includes("家")) return "home";
-  if (title.includes("食")) return "shopping_cart";
-  if (title.includes("電") || title.includes("ガス") || title.includes("水")) return "lightbulb";
-  if (title.includes("車") || title.includes("交通")) return "directions_car";
-  if (title.includes("通信") || title.includes("スマホ")) return "wifi";
+  if (title.includes("家") || title.includes("rent") || title.includes("home")) return "home";
+  if (title.includes("食") || title.includes("food") || title.includes("grocer")) return "shopping_cart";
+  if (title.includes("電") || title.includes("ガス") || title.includes("水") || title.includes("utility") || title.includes("electric")) return "lightbulb";
+  if (title.includes("車") || title.includes("交通") || title.includes("car") || title.includes("vehicle") || title.includes("transport")) return "directions_car";
+  if (title.includes("通信") || title.includes("スマホ") || title.includes("phone") || title.includes("internet")) return "wifi";
   return "payments";
 }
 
@@ -682,28 +982,31 @@ function formatDateKey(date) {
 }
 
 function formatShortDate(date) {
-  return `${date.getMonth() + 1}/${date.getDate()}`;
+  return new Intl.DateTimeFormat(localeTag(), {
+    month: "numeric",
+    day: "numeric"
+  }).format(date);
 }
 
 function formatWeekday(date) {
-  return date.toLocaleDateString("ja-JP", { weekday: "short" });
+  return date.toLocaleDateString(localeTag(), { weekday: "short" });
 }
 
 function formatDateTime(isoString) {
   try {
-    return new Date(isoString).toLocaleString("ja-JP", {
+    return new Date(isoString).toLocaleString(localeTag(), {
       month: "numeric",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit"
     });
   } catch {
-    return "未保存";
+    return t("summary.unsaved");
   }
 }
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat("ja-JP", {
+  return new Intl.NumberFormat(localeTag(), {
     style: "currency",
     currency: "JPY",
     maximumFractionDigits: 0
@@ -711,7 +1014,7 @@ function formatCurrency(value) {
 }
 
 function formatCompactCurrency(value) {
-  return new Intl.NumberFormat("ja-JP", {
+  return new Intl.NumberFormat(localeTag(), {
     notation: "compact",
     maximumFractionDigits: 1
   }).format(value);
@@ -723,7 +1026,15 @@ function formatSignedCurrency(value) {
 }
 
 function formatDelta(value) {
-  return `差分 ${formatSignedCurrency(value)}`;
+  return t("summary.delta", { amount: formatSignedCurrency(value) });
+}
+
+function formatRangeDays(days) {
+  return currentLocale === "ja" ? `${days}日` : `${days} days`;
+}
+
+function localeTag() {
+  return currentLocale === "en" ? "en-US" : "ja-JP";
 }
 
 function clamp(value, min, max) {
