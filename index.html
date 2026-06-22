@@ -98,6 +98,18 @@
                 <input id="titleInput" type="text" maxlength="28" autocomplete="off" placeholder="例: 食費、給与、家賃など" data-i18n-placeholder="fields.titlePlaceholder" required>
               </label>
 
+              <div class="category-block">
+                <label class="field">
+                  <span data-i18n="fields.category">カテゴリ</span>
+                  <select id="categorySelect" data-i18n-aria-label="fields.category"></select>
+                </label>
+                <div class="category-add-row">
+                  <input id="categoryNameInput" type="text" maxlength="18" autocomplete="off" placeholder="例: 教育費" data-i18n-placeholder="fields.categoryPlaceholder">
+                  <button type="button" id="addCategoryButton" data-i18n="actions.addCategory">カテゴリ追加</button>
+                </div>
+                <div class="category-chips" id="categoryChips" aria-live="polite"></div>
+              </div>
+
               <label class="field">
                 <span data-i18n="fields.amount">金額</span>
                 <div class="amount-row">

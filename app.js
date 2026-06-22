@@ -39,6 +39,8 @@ const I18N = {
       titlePlaceholder: "例: 食費、給与、家賃など",
       amount: "金額",
       quickAmounts: "金額をすばやく追加",
+      category: "カテゴリ",
+      categoryPlaceholder: "例: 教育費",
       kind: "種類",
       kindAria: "収入または支出",
       repeat: "繰り返し",
@@ -60,6 +62,8 @@ const I18N = {
       update: "更新する",
       saveBalance: "残高を保存",
       cancelEdit: "編集をやめる",
+      addCategory: "カテゴリ追加",
+      deleteCategory: "{name}を削除",
       editItem: "{title}を編集",
       deleteItem: "{title}を削除"
     },
@@ -77,6 +81,14 @@ const I18N = {
       projectedBalance: "予測残高",
       currentBalance: "現在残高"
     },
+    categories: {
+      defaultIncome: "収入",
+      defaultHousing: "住居費",
+      defaultFood: "食費",
+      defaultUtilities: "光熱費",
+      defaultTransport: "交通費",
+      defaultOther: "その他"
+    },
     schedule: {
       title: "今後の予定",
       empty: "予定はまだありません。最初の固定費や給与を追加してみましょう。",
@@ -91,10 +103,15 @@ const I18N = {
       added: "予定を追加しました。",
       balanceSaved: "現在残高を保存しました。",
       editing: "予定を編集しています。",
-      deleted: "予定を削除しました。"
+      deleted: "予定を削除しました。",
+      categoryRequired: "カテゴリ名を入力してください。",
+      categoryExists: "同じカテゴリがすでにあります。",
+      categoryAdded: "カテゴリを追加しました。",
+      categoryDeleted: "カテゴリを削除しました。"
     },
     confirm: {
       deleteSchedule: "「{title}」を削除しますか？",
+      deleteCategory: "カテゴリ「{name}」を削除しますか？このカテゴリの予定は「その他」に移動します。",
       loadSample: "サンプルデータに戻しますか？現在の入力内容は上書きされます。",
       clearData: "保存データを削除しますか？画面は初期サンプルに戻ります。"
     },
@@ -143,6 +160,8 @@ const I18N = {
       titlePlaceholder: "e.g. groceries, salary, rent",
       amount: "Amount",
       quickAmounts: "Quick amount add buttons",
+      category: "Category",
+      categoryPlaceholder: "e.g. education",
       kind: "Kind",
       kindAria: "Income or expense",
       repeat: "Repeat",
@@ -164,6 +183,8 @@ const I18N = {
       update: "Update",
       saveBalance: "Save balance",
       cancelEdit: "Cancel edit",
+      addCategory: "Add category",
+      deleteCategory: "Delete {name}",
       editItem: "Edit {title}",
       deleteItem: "Delete {title}"
     },
@@ -181,6 +202,14 @@ const I18N = {
       projectedBalance: "Projected balance",
       currentBalance: "Current balance"
     },
+    categories: {
+      defaultIncome: "Income",
+      defaultHousing: "Housing",
+      defaultFood: "Food",
+      defaultUtilities: "Utilities",
+      defaultTransport: "Transport",
+      defaultOther: "Other"
+    },
     schedule: {
       title: "Upcoming schedules",
       empty: "No schedules yet. Add your first fixed cost or income.",
@@ -195,10 +224,15 @@ const I18N = {
       added: "Schedule added.",
       balanceSaved: "Current balance saved.",
       editing: "Editing a schedule.",
-      deleted: "Schedule deleted."
+      deleted: "Schedule deleted.",
+      categoryRequired: "Enter a category name.",
+      categoryExists: "That category already exists.",
+      categoryAdded: "Category added.",
+      categoryDeleted: "Category deleted."
     },
     confirm: {
       deleteSchedule: "Delete \"{title}\"?",
+      deleteCategory: "Delete category \"{name}\"? Its schedules will move to Other.",
       loadSample: "Reset to sample data? Your current entries will be overwritten.",
       clearData: "Delete saved data? The screen will return to the sample data."
     },
@@ -228,6 +262,10 @@ const elements = {
   sixMonthDelta: document.querySelector("#sixMonthDelta"),
   form: document.querySelector("#scheduleForm"),
   titleInput: document.querySelector("#titleInput"),
+  categorySelect: document.querySelector("#categorySelect"),
+  categoryNameInput: document.querySelector("#categoryNameInput"),
+  addCategoryButton: document.querySelector("#addCategoryButton"),
+  categoryChips: document.querySelector("#categoryChips"),
   amountInput: document.querySelector("#amountInput"),
   balanceInput: document.querySelector("#balanceInput"),
   dayInput: document.querySelector("#dayInput"),
@@ -279,7 +317,19 @@ function bindEvents() {
   elements.saveBalanceButton.addEventListener("click", saveCurrentBalance);
   elements.cancelEditButton.addEventListener("click", resetForm);
   elements.form.addEventListener("submit", saveScheduleFromForm);
-
+  elements.addCategoryButton.addEventListener("click", addCategoryFromInput);
+  elements.categoryNameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addCategoryFromInput();
+    }
+  });
+  elements.categoryChips.addEventListener("click", (event) => {
+    const deleteButton = event.target.closest("[data-delete-category-id]");
+    if (deleteButton) {
+      deleteCategory(deleteButton.dataset.deleteCategoryId);
+    }
+  });
   document.querySelectorAll("[data-kind]").forEach((button) => {
     button.addEventListener("click", () => setKind(button.dataset.kind));
   });
@@ -389,16 +439,29 @@ function applyI18n() {
   setSubmitButtonLabel();
 }
 
+function defaultCategories() {
+  return [
+    { id: "cat_income", nameKey: "categories.defaultIncome", isDefault: true },
+    { id: "cat_housing", nameKey: "categories.defaultHousing", isDefault: true },
+    { id: "cat_food", nameKey: "categories.defaultFood", isDefault: true },
+    { id: "cat_utilities", nameKey: "categories.defaultUtilities", isDefault: true },
+    { id: "cat_transport", nameKey: "categories.defaultTransport", isDefault: true },
+    { id: "cat_other", nameKey: "categories.defaultOther", isDefault: true }
+  ];
+}
+
 function defaultState() {
   return {
     user_profile: {
       current_balance: 290000,
       updated_at: new Date().toISOString()
     },
+    categories: defaultCategories(),
     schedules: [
       {
         id: "item_salary",
         title: t("sample.salary"),
+        categoryId: "cat_income",
         amount: 295000,
         type: "monthly",
         day: 25
@@ -406,6 +469,7 @@ function defaultState() {
       {
         id: "item_rent",
         title: t("sample.rent"),
+        categoryId: "cat_housing",
         amount: -85000,
         type: "monthly",
         day: 27
@@ -413,6 +477,7 @@ function defaultState() {
       {
         id: "item_food",
         title: t("sample.food"),
+        categoryId: "cat_food",
         amount: -30000,
         type: "monthly",
         day: 27
@@ -420,6 +485,7 @@ function defaultState() {
       {
         id: "item_utility",
         title: t("sample.utility"),
+        categoryId: "cat_utilities",
         amount: -8500,
         type: "monthly",
         day: 3
@@ -427,6 +493,7 @@ function defaultState() {
       {
         id: "item_bonus",
         title: t("sample.bonus"),
+        categoryId: "cat_income",
         amount: 120000,
         type: "one-time",
         date: "2026-07-10"
@@ -434,6 +501,7 @@ function defaultState() {
       {
         id: "item_car",
         title: t("sample.car"),
+        categoryId: "cat_transport",
         amount: -100000,
         type: "one-time",
         date: "2026-09-15"
@@ -454,16 +522,19 @@ function loadState() {
       return defaultState();
     }
 
+    const categories = normalizeCategories(parsed.categories);
     return {
       user_profile: {
         current_balance: Number(parsed.user_profile.current_balance) || 0,
         updated_at: parsed.user_profile.updated_at || new Date().toISOString()
       },
+      categories,
       schedules: parsed.schedules
         .filter((item) => item && item.id && item.title && Number.isFinite(Number(item.amount)))
         .map((item) => ({
           id: String(item.id),
           title: String(item.title).slice(0, 50),
+          categoryId: resolveCategoryId(item.categoryId || item.category, categories),
           amount: Math.trunc(Number(item.amount)),
           type: item.type === "one-time" ? "one-time" : "monthly",
           day: Number(item.day) || 1,
@@ -473,6 +544,72 @@ function loadState() {
   } catch {
     return defaultState();
   }
+}
+
+function normalizeCategories(savedCategories) {
+  const defaults = defaultCategories();
+  const categories = [...defaults];
+
+  if (!Array.isArray(savedCategories)) {
+    return categories;
+  }
+
+  savedCategories.forEach((category) => {
+    const normalized = normalizeCategory(category);
+    if (!normalized || defaults.some((item) => item.id === normalized.id) || categories.some((item) => item.name === normalized.name)) {
+      return;
+    }
+    categories.push(normalized);
+  });
+
+  return categories;
+}
+
+function normalizeCategory(category) {
+  if (typeof category === "string") {
+    const name = category.trim();
+    if (!name) {
+      return null;
+    }
+    return {
+      id: `cat_${slugify(name)}`,
+      name,
+      isDefault: false
+    };
+  }
+
+  if (!category || typeof category !== "object") {
+    return null;
+  }
+
+  const id = String(category.id || "").trim();
+  const name = String(category.name || "").trim();
+  const nameKey = String(category.nameKey || "").trim();
+
+  if (!id || (!name && !nameKey)) {
+    return null;
+  }
+
+  return {
+    id,
+    name,
+    nameKey,
+    isDefault: Boolean(category.isDefault)
+  };
+}
+
+function resolveCategoryId(value, categories = state?.categories || defaultCategories()) {
+  if (!value) {
+    return "cat_other";
+  }
+
+  const raw = String(value);
+  if (categories.some((category) => category.id === raw)) {
+    return raw;
+  }
+
+  const byName = categories.find((category) => categoryDisplayName(category) === raw || category.name === raw);
+  return byName?.id || "cat_other";
 }
 
 function persist() {
@@ -486,9 +623,111 @@ function persist() {
 }
 
 function render() {
+  renderCategories();
   renderSummary();
   renderChart();
   renderScheduleList();
+}
+
+function renderCategories() {
+  const selectedCategoryId = elements.categorySelect.value || "cat_other";
+  elements.categorySelect.innerHTML = state.categories
+    .map((category) => {
+      const name = categoryDisplayName(category);
+      return `<option value="${escapeHtml(category.id)}">${escapeHtml(name)}</option>`;
+    })
+    .join("");
+
+  elements.categorySelect.value = state.categories.some((category) => category.id === selectedCategoryId)
+    ? selectedCategoryId
+    : "cat_other";
+
+  const customCategories = state.categories.filter((category) => !category.isDefault);
+  elements.categoryChips.innerHTML = customCategories
+    .map((category) => {
+      const name = categoryDisplayName(category);
+      return `
+        <span class="category-chip">
+          ${escapeHtml(name)}
+          <button type="button" data-delete-category-id="${escapeHtml(category.id)}" aria-label="${escapeHtml(t("actions.deleteCategory", { name }))}">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+          </button>
+        </span>
+      `;
+    })
+    .join("");
+}
+
+function categoryDisplayName(category) {
+  if (category?.nameKey) {
+    return t(category.nameKey);
+  }
+  return category?.name || t("categories.defaultOther");
+}
+
+function addCategoryFromInput() {
+  const name = elements.categoryNameInput.value.trim();
+  if (!name) {
+    setFeedback(t("feedback.categoryRequired"), true);
+    elements.categoryNameInput.focus();
+    return;
+  }
+
+  const exists = state.categories.some((category) => categoryDisplayName(category).toLowerCase() === name.toLowerCase() || category.name?.toLowerCase() === name.toLowerCase());
+  if (exists) {
+    setFeedback(t("feedback.categoryExists"), true);
+    elements.categoryNameInput.focus();
+    return;
+  }
+
+  const category = {
+    id: uniqueCategoryId(name),
+    name,
+    isDefault: false
+  };
+  state.categories.push(category);
+  elements.categoryNameInput.value = "";
+  persist();
+  renderCategories();
+  elements.categorySelect.value = category.id;
+  setFeedback(t("feedback.categoryAdded"), false);
+}
+
+function deleteCategory(id) {
+  const category = state.categories.find((item) => item.id === id);
+  if (!category || category.isDefault) {
+    return;
+  }
+
+  const name = categoryDisplayName(category);
+  if (!window.confirm(t("confirm.deleteCategory", { name }))) {
+    return;
+  }
+
+  state.categories = state.categories.filter((item) => item.id !== id);
+  state.schedules = state.schedules.map((item) => (
+    item.categoryId === id ? { ...item, categoryId: "cat_other" } : item
+  ));
+  persist();
+  render();
+  setFeedback(t("feedback.categoryDeleted"), false);
+}
+
+function uniqueCategoryId(name) {
+  const base = `cat_${slugify(name) || Date.now().toString(36)}`;
+  if (!state.categories.some((category) => category.id === base)) {
+    return base;
+  }
+  return `${base}_${Date.now().toString(36)}`;
+}
+
+function slugify(value) {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 28);
 }
 
 function renderSummary() {
@@ -631,6 +870,7 @@ function renderScheduleList() {
       const item = occurrence.schedule;
       const isIncome = item.amount > 0;
       const safeId = escapeHtml(item.id);
+      const categoryName = categoryDisplayName(state.categories.find((category) => category.id === resolveCategoryId(item.categoryId)));
       return `
         <article class="schedule-item">
           <time class="schedule-date" datetime="${occurrence.date}">
@@ -643,6 +883,7 @@ function renderScheduleList() {
           <div class="schedule-main">
             <div class="schedule-title">
               <span>${escapeHtml(item.title)}</span>
+              <span class="badge category-badge">${escapeHtml(categoryName)}</span>
               <span class="badge">${item.type === "monthly" ? t("repeat.monthly") : t("repeat.oneTime")}</span>
             </div>
             <div class="schedule-amount ${isIncome ? "income" : "expense"}">${formatSignedCurrency(item.amount)}</div>
@@ -689,6 +930,7 @@ function saveScheduleFromForm(event) {
   const schedule = {
     id: editingId || `item_${Date.now().toString(36)}`,
     title,
+    categoryId: elements.categorySelect.value || "cat_other",
     amount: Math.trunc(amount),
     type: selectedRepeat
   };
@@ -739,6 +981,7 @@ function startEdit(id) {
 
   editingId = item.id;
   elements.titleInput.value = item.title;
+  elements.categorySelect.value = resolveCategoryId(item.categoryId);
   elements.amountInput.value = Math.abs(item.amount);
   elements.balanceInput.value = state.user_profile.current_balance;
   setKind(item.amount > 0 ? "income" : "expense");
@@ -778,6 +1021,8 @@ function resetForm(options = {}) {
   editingId = null;
   elements.form.reset();
   elements.balanceInput.value = state.user_profile.current_balance;
+  elements.categorySelect.value = "cat_other";
+  elements.categoryNameInput.value = "";
   elements.dayInput.value = 25;
   elements.dateInput.value = formatDateKey(addDays(today(), 7));
   setKind("expense");
