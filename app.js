@@ -92,7 +92,8 @@ const I18N = {
     schedule: {
       title: "今後の予定",
       empty: "予定はまだありません。最初の固定費や給与を追加してみましょう。",
-      monthlyTotal: "毎月合計 {amount}"
+      monthlyTotal: "毎月合計 {amount}",
+      balanceAfter: "残高 {amount}"
     },
     feedback: {
       storageFailed: "ブラウザの保存領域に書き込めませんでした。",
@@ -213,7 +214,8 @@ const I18N = {
     schedule: {
       title: "Upcoming schedules",
       empty: "No schedules yet. Add your first fixed cost or income.",
-      monthlyTotal: "Monthly total {amount}"
+      monthlyTotal: "Monthly total {amount}",
+      balanceAfter: "Balance {amount}"
     },
     feedback: {
       storageFailed: "Could not write to this browser's storage.",
@@ -886,7 +888,12 @@ function renderScheduleList() {
               <span class="badge category-badge">${escapeHtml(categoryName)}</span>
               <span class="badge">${item.type === "monthly" ? t("repeat.monthly") : t("repeat.oneTime")}</span>
             </div>
-            <div class="schedule-amount ${isIncome ? "income" : "expense"}">${formatSignedCurrency(item.amount)}</div>
+            <div class="schedule-figures">
+              <div class="schedule-amount ${isIncome ? "income" : "expense"}">${formatSignedCurrency(item.amount)}</div>
+              <div class="schedule-balance ${occurrence.balanceAfter < 0 ? "danger" : ""}">
+                ${t("schedule.balanceAfter", { amount: formatCurrency(occurrence.balanceAfter) })}
+              </div>
+            </div>
           </div>
           <div class="row-actions">
             <button type="button" data-edit-id="${safeId}" aria-label="${escapeHtml(t("actions.editItem", { title: item.title }))}">
@@ -1154,14 +1161,17 @@ function occursOnDate(item, date) {
 
 function getUpcomingOccurrences(limit, withinDays) {
   const occurrences = [];
+  let balance = state.user_profile.current_balance;
   const start = today();
 
   for (let offset = 0; offset <= withinDays; offset += 1) {
     const date = addDays(start, offset);
     transactionsOnDate(date).forEach((schedule) => {
+      balance += schedule.amount;
       occurrences.push({
         date: formatDateKey(date),
-        schedule
+        schedule,
+        balanceAfter: balance
       });
     });
 
